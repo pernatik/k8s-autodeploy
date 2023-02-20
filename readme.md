@@ -1,0 +1,10 @@
+Infrastructure:
+```
+k8s-lb01       
+k8s-master01    
+k8s-master02    
+k8s-master03    
+k8s-node01      
+k8s-node02      
+k8s-node03      
+```
