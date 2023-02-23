@@ -34,3 +34,43 @@ apt update
 sudo apt-get install -y kubelet kubeadm kubectl docker-ce
 
 ```
+
+Для k8s-lb01:
+```
+apt install -y nginx
+systemctl enable nginx
+systemctl status nginx
+mkdir -p /etc/nginx/tcpconf.d
+nano /etc/nginx/nginx.conf
+--->
+include /etc/nginx/tcpconf.d/*;
+--->
+
+```
+add nginx conf --> /etc/nginx/tcpconf.d/kubernates.conf
+```
+stream { 
+  upstream kubernates { 
+    server 192.168.0.131:6443; 
+    server 192.168.0.132:6443; 
+    server 192.168.0.133:6443; 
+  } 
+  server { 
+    listen 6443; 
+    proxy_pass kubernates; 
+  } 
+}
+```
+рестарт nginx:
+```
+nginx -s reload
+```
+
+kubeadm-config.yaml
+```
+apiVersion: kubeadm.k8s.io/v1beta1
+kind: ClusterConfiguration
+kubernetesVersion: stable
+controlPlaneEndpoint: "192.168.0.130:6433"
+```
+kubeadm init --config=kubeadm-config.yaml --upload-certs
