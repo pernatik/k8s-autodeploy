@@ -3,7 +3,7 @@ control-plane
 #worker-nodes
 
 [control-plane]
-cp1.k8s.lo  ansible_host=130.193.34.65
+cp1.k8s.lo  ansible_host=192.168.0.140
 #cp2.k8s.lo  ansible_host=51.250.26.232
 
 #[worker-nodes]
