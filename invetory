@@ -1,0 +1,11 @@
+[all:children]
+control-plane
+#worker-nodes
+
+[control-plane]
+cp1.k8s.lo  ansible_host=130.193.34.65
+#cp2.k8s.lo  ansible_host=51.250.26.232
+
+#[worker-nodes]
+#sosige-store.srv1.yandex.ru  ansible_host=130.193.34.65
+#sosige-store.srv2.yandex.ru  ansible_host=51.250.26.232
