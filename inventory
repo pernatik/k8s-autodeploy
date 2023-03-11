@@ -16,12 +16,12 @@ cp1.k8s.lo  ansible_host=192.168.0.140
 # #sosige-store.srv1.yandex.ru  ansible_host=130.193.34.65
 # #sosige-store.srv2.yandex.ru  ansible_host=51.250.26.232
 ############################
-[all]
-master0   ansible_host=10.10.1.126 ip=10.10.1.126
-master1   ansible_host=10.10.1.194 ip=10.10.1.194
-master2   ansible_host=10.10.1.134 ip=10.10.1.134
-worker0   ansible_host=10.10.1.146 ip=10.10.1.146
-worker1   ansible_host=10.10.1.122 ip=10.10.1.122
+# [all]
+# master0   ansible_host=10.10.1.126 ip=10.10.1.126
+# master1   ansible_host=10.10.1.194 ip=10.10.1.194
+# master2   ansible_host=10.10.1.134 ip=10.10.1.134
+# worker0   ansible_host=10.10.1.146 ip=10.10.1.146
+# worker1   ansible_host=10.10.1.122 ip=10.10.1.122
 
 # ## configure a bastion host if your nodes are not directly reachable
 # bastion ansible_host=x.x.x.x ansible_user=some_user
