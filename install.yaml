@@ -79,21 +79,29 @@
     #  - name: делаем дефалтным конфиг containerd
     #    command: "containerd config default | sudo tee /etc/containerd/config.toml >/dev/null 2>&1"
 
-    - name: Ansible delete file example
-      file:
-        path: /etc/containerd/config.toml
-        state: absent
+    # - name: Ansible delete file example
+    #   file:
+    #     path: /etc/containerd/config.toml
+    #     state: absent
 
-    - name: restart containerd service
-      service:
-        name: containerd
-        state: restarted
-      become: true
+    # - name: restart containerd service
+    #   service:
+    #     name: containerd
+    #     state: restarted
+    #   become: true
 
-    - name: systemctl enable containerd
-      service:
-        name: containerd
-        enabled: yes
+    # - name: systemctl enable containerd
+    #   service:
+    #     name: containerd
+    #     enabled: yes
+
+    - name: тест shell
+      shell: |
+        cat tee /etc/modules-load.d/containerd.conf <<' EOF'
+        overlay
+        br_netfilter
+        1
+        EOF
 
   #  - name: Reboot all the kubernetes nodes.
   #    reboot:
