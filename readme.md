@@ -1,4 +1,14 @@
-Infrastructure:
+Подготовка машины для развертывания:
+```
+apt install ansible
+```
+Для домашней лабы проще ходить по логин/пасс на ВМ, поэтому надо доставить sshpass:
+
+```
+apt install sshpass
+```
+
+My infrastructure:
 ```
 k8s-lb01       192.168.0.130
 k8s-master01   129.168.0.131

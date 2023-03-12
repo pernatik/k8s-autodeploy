@@ -1,0 +1,117 @@
+---
+- hosts: "all"
+  remote_user: root
+  become: yes
+  become_method: sudo
+  become_user: root
+  gather_facts: yes
+  connection: ssh
+
+  tasks:
+    - name: Мгновенное отключение свопа
+      command: swapoff -a
+
+    - name: УДаление свапа из загрузки
+      lineinfile:
+        dest: /etc/fstab
+        regexp: swap
+        state: absent
+
+    - name: Installing Prerequisites for Kubernetes
+      apt:
+        name:
+          - apt-transport-https
+          - ca-certificates
+          - curl
+          - gnupg-agent
+          - vim
+          - software-properties-common
+        state: present
+
+    - name: Add Docker’s official GPG key
+      apt_key:
+        url: https://download.docker.com/linux/ubuntu/gpg
+        state: present
+
+    - name: Add Docker Repository
+      apt_repository:
+        repo: deb [arch=amd64] https://download.docker.com/linux/ubuntu jammy stable
+        state: present
+        filename: docker
+        mode: 0600
+
+    - name: Add Google official GPG key
+      apt_key:
+        url: https://packages.cloud.google.com/apt/doc/apt-key.gpg
+        state: present
+
+    - name: Add Kubernetes Repository
+      apt_repository:
+        repo: deb http://apt.kubernetes.io/ kubernetes-xenial main
+        state: present
+        filename: kubernetes
+        mode: 0600
+
+    - name: Installing Kubernetes Cluster Packages.
+      apt:
+        name:
+          - containerd.io
+          - kubeadm
+          - kubectl
+          - kubelet
+        state: present
+
+    - name: блокируем обновления для kubelet kubeadm kubectl
+      command: "apt-mark hold kubelet kubeadm kubectl"
+
+    - name: делаем дефалтным конфиг containerd
+      command: "containerd config default | sudo tee /etc/containerd/config.toml >/dev/null 2>&1"
+
+    - name: Ansible delete file example
+      file:
+        path: /etc/containerd/config.toml
+        state: absent
+
+    - name: restart containerd service
+      service:
+        name: containerd
+        state: restarted
+      become: true
+
+    - name: systemctl enable containerd
+      service:
+        name: containerd
+        enabled: yes
+
+    - name: настраиваем containerd.conf
+      shell:
+        cmd: |
+          tee /etc/modules-load.d/containerd.conf <<EOF
+          overlay
+          br_netfilter
+          EOF
+
+    - name: modprobe overlay
+      command: "modprobe overlay"
+
+    - name: modprobe br_netfilter
+      command: "modprobe br_netfilter"
+
+    - name: тест shell
+      shell:
+        cmd: |
+          tee /etc/sysctl.d/kubernetes.conf <<EOF
+          net.bridge.bridge-nf-call-ip6tables = 1
+          net.bridge.bridge-nf-call-iptables = 1
+          net.ipv4.ip_forward = 1
+          EOF
+
+    - name: Применяем параметры ядра
+      command: "sysctl --system"
+
+    - name: Reboot all the kubernetes nodes.
+      reboot:
+        post_reboot_delay: 10
+        reboot_timeout: 40
+        connect_timeout: 60
+        test_command: uptime
