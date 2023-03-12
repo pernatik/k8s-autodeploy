@@ -36,7 +36,7 @@
    
    - name: Add Docker Repository
      apt_repository:
-       repo: deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable
+       repo: deb [arch=amd64] https://download.docker.com/linux/ubuntu jammy stable
        state: present
        filename: docker
        mode: 0600
