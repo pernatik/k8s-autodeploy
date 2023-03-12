@@ -80,8 +80,8 @@
    - name: делаем дефалтным конфиг контейнерд
      command: "containerd config default | sudo tee /etc/containerd/config.toml >/dev/null 2>&1"
 
-   - name: Create a text file in opt directory using /bin/sh shell
-     ansible.builtin.shell: containerd config default | sudo tee /etc/containerd/config.toml >/dev/null 2>&1
+  #  - name: Create a text file in opt directory using /bin/sh shell
+  #    ansible.builtin.shell: containerd config default | sudo tee /etc/containerd/config.toml >/dev/null 2>&1
 
   #  - name: Enable service kubelet, and enable persistently
   #    service: 
