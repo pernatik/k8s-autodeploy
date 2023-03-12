@@ -1,8 +1,10 @@
 [all]
 cp1.k8s.lo  ansible_host=192.168.0.140
-# cp2.k8s.lo  ansible_host=192.168.0.141
-# cp3.k8s.lo  ansible_host=192.168.0.142
-
+cp2.k8s.lo  ansible_host=192.168.0.141
+cp3.k8s.lo  ansible_host=192.168.0.142
+wn1.k8s.lo  ansible_host=192.168.0.143
+wn2.k8s.lo  ansible_host=192.168.0.144
+wn3.k8s.lo  ansible_host=192.168.0.145
 
 # [all:children]
 # control-plane
