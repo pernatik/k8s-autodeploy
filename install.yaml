@@ -77,16 +77,24 @@
    - name: блокируем обновления для kubelet kubeadm kubectl
      command: "apt-mark hold kubelet kubeadm kubectl"
 
-   - name: делаем дефалтным конфиг контейнерд
+   - name: делаем дефалтным конфиг containerd
      command: "containerd config default | sudo tee /etc/containerd/config.toml >/dev/null 2>&1"
 
-  #  - name: Create a text file in opt directory using /bin/sh shell
-  #    ansible.builtin.shell: containerd config default | sudo tee /etc/containerd/config.toml >/dev/null 2>&1
+   - name: Меняем гпмтройки containerd
+     command: "sudo sed -i 's/SystemdCgroup \= false/SystemdCgroup \= true/g' /etc/containerd/config.toml"
 
-  #  - name: Enable service kubelet, and enable persistently
-  #    service: 
-  #      name: kubelet
-  #      enabled: yes
+
+   - name: restart containerd service
+     service:
+       name: containerd
+       state: restarted
+     become: true
+
+   - name: systemctl enable containerd
+     service: 
+       name: containerd
+       enabled: yes
+
 
   #  - name: Reboot all the kubernetes nodes.
   #    reboot:
