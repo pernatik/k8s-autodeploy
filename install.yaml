@@ -96,12 +96,12 @@
     #     enabled: yes
 
     - name: тест shell
-      shell: |
-        tee /etc/modules-load.d/containerd.conf <<' EOF'
-        overlay
-        br_netfilter
-        1
-        EOF
+      shell:
+        cmd: |
+          tee /etc/modules-load.d/containerd.conf <<EOF
+          overlay
+          br_netfilter
+          EOF
 
   #  - name: Reboot all the kubernetes nodes.
   #    reboot:
