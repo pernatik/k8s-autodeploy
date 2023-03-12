@@ -97,7 +97,7 @@
 
     - name: тест shell
       shell: |
-        cat tee /etc/modules-load.d/containerd.conf <<' EOF'
+        tee /etc/modules-load.d/containerd.conf <<' EOF'
         overlay
         br_netfilter
         1
