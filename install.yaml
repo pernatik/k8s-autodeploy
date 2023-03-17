@@ -11,7 +11,7 @@
     - name: Мгновенное отключение свопа
       command: swapoff -a
 
-    - name: УДаление свапа из загрузки
+    - name: Удаление свопа из загрузки
       lineinfile:
         dest: /etc/fstab
         regexp: swap
