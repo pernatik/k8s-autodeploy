@@ -69,18 +69,32 @@
       become: true
 
     - name: блокируем обновления для kubelet kubeadm kubectl
-      command: "sudo apt-mark hold kubelet kubeadm kubectl"
+      command: "apt-mark hold kubelet kubeadm kubectl"
       become: true
 
     - name: делаем дефалтным конфиг containerd
-      command: "sudo containerd config default | sudo tee /etc/containerd/config.toml >/dev/null 2>&1"
+      command: "containerd config default | tee /etc/containerd/config.toml >/dev/null 2>&1"
       become: true
 
-    - name: Ansible delete file example
-      file:
-        path: /etc/containerd/config.toml
-        state: absent
-      become: true
+    # - name: configure the systemd cgroup driver for runC
+    #   command: "sed -i 's/SystemdCgroup \= false/SystemdCgroup \= true/g' /etc/containerd/config.toml"
+    #   become: true
+
+    - name: configure the systemd cgroup driver for runC
+      lineinfile:
+        path: /etc/hosts
+        search_string: "SystemdCgroup = false"
+        line: SystemdCgroup = true
+
+    # - name: делаем дефалтным конфиг containerd
+    #   command: "sudo containerd config default | sudo tee /etc/containerd/config.toml >/dev/null 2>&1"
+    #   become: true
+
+    # - name: Ansible delete file example
+    #   file:
+    #     path: /etc/containerd/config.toml
+    #     state: absent
+    #   become: true
 
     - name: restart containerd service
       service:
