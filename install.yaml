@@ -82,9 +82,9 @@
 
     - name: configure the systemd cgroup driver for runC
       lineinfile:
-        path: /etc/hosts
-        search_string: "SystemdCgroup = false"
-        line: SystemdCgroup = true
+        path: /etc/containerd/config.toml
+        regexp: "^(.*)SystemdCgroup(.*)$"
+        line: "SystemdCgroup = true"
 
     # - name: делаем дефалтным конфиг containerd
     #   command: "sudo containerd config default | sudo tee /etc/containerd/config.toml >/dev/null 2>&1"

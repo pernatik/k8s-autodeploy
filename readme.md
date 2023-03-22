@@ -1,5 +1,12 @@
 Not stable workin now!!!
 
+Создать пользователя с домашней директорией
+```
+useradd -m ansible
+passwd ansible
+usermod -aG sudo ansible
+```
+
 Подготовка машины для развертывания:
 ```
 apt install ansible
