@@ -1,3 +1,5 @@
+Not stable workin now!!!
+
 Подготовка машины для развертывания:
 ```
 apt install ansible
