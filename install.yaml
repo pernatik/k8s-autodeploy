@@ -1,6 +1,6 @@
 ---
 - hosts: "all"
-  remote_user: root
+  remote_user: ansible
   become: yes
   become_method: sudo
   become_user: root
@@ -11,11 +11,12 @@
     - name: Мгновенное отключение свопа
       command: swapoff -a
 
-    - name: УДаление свапа из загрузки
+    - name: Удаление свопа из загрузки
       lineinfile:
         dest: /etc/fstab
         regexp: swap
         state: absent
+      become: true
 
     - name: Installing Prerequisites for Kubernetes
       apt:
@@ -27,11 +28,13 @@
           - vim
           - software-properties-common
         state: present
+      become: true
 
     - name: Add Docker’s official GPG key
       apt_key:
         url: https://download.docker.com/linux/ubuntu/gpg
         state: present
+      become: true
 
     - name: Add Docker Repository
       apt_repository:
@@ -39,11 +42,13 @@
         state: present
         filename: docker
         mode: 0600
+      become: true
 
     - name: Add Google official GPG key
       apt_key:
         url: https://packages.cloud.google.com/apt/doc/apt-key.gpg
         state: present
+      become: true
 
     - name: Add Kubernetes Repository
       apt_repository:
@@ -51,6 +56,7 @@
         state: present
         filename: kubernetes
         mode: 0600
+      become: true
 
     - name: Installing Kubernetes Cluster Packages.
       apt:
@@ -60,17 +66,35 @@
           - kubectl
           - kubelet
         state: present
+      become: true
 
     - name: блокируем обновления для kubelet kubeadm kubectl
       command: "apt-mark hold kubelet kubeadm kubectl"
+      become: true
 
     - name: делаем дефалтным конфиг containerd
-      command: "containerd config default | sudo tee /etc/containerd/config.toml >/dev/null 2>&1"
+      command: "containerd config default | tee /etc/containerd/config.toml >/dev/null 2>&1"
+      become: true
 
-    - name: Ansible delete file example
-      file:
-        path: /etc/containerd/config.toml
-        state: absent
+    # - name: configure the systemd cgroup driver for runC
+    #   command: "sed -i 's/SystemdCgroup \= false/SystemdCgroup \= true/g' /etc/containerd/config.toml"
+    #   become: true
+
+    - name: configure the systemd cgroup driver for runC
+      lineinfile:
+        path: /etc/hosts
+        search_string: "SystemdCgroup = false"
+        line: SystemdCgroup = true
+
+    # - name: делаем дефалтным конфиг containerd
+    #   command: "sudo containerd config default | sudo tee /etc/containerd/config.toml >/dev/null 2>&1"
+    #   become: true
+
+    # - name: Ansible delete file example
+    #   file:
+    #     path: /etc/containerd/config.toml
+    #     state: absent
+    #   become: true
 
     - name: restart containerd service
       service:
@@ -82,6 +106,7 @@
       service:
         name: containerd
         enabled: yes
+      become: true
 
     - name: настраиваем containerd.conf
       shell:
@@ -90,12 +115,15 @@
           overlay
           br_netfilter
           EOF
+      become: true
 
     - name: modprobe overlay
       command: "modprobe overlay"
+      become: true
 
     - name: modprobe br_netfilter
       command: "modprobe br_netfilter"
+      become: true
 
     - name: тест shell
       shell:
@@ -105,9 +133,11 @@
           net.bridge.bridge-nf-call-iptables = 1
           net.ipv4.ip_forward = 1
           EOF
+      become: true
 
     - name: Применяем параметры ядра
-      command: "sysctl --system"
+      command: "sudo sysctl --system"
+      become: true
 
     - name: Reboot all the kubernetes nodes.
       reboot:
@@ -115,3 +145,4 @@
         reboot_timeout: 40
         connect_timeout: 60
         test_command: uptime
+      become: true
