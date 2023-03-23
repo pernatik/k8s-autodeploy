@@ -1,0 +1,23 @@
+---
+- hosts: "all"
+  remote_user: ansible
+  become: yes
+  become_method: sudo
+  become_user: root
+  gather_facts: yes
+  connection: ssh
+
+  tasks:
+    - name: делаем дефалтным конфиг containerd
+      command: "containerd config default | tee /etc/containerd/config.toml >/dev/null 2>&1"
+      become: true
+
+    # - name: configure the systemd cgroup driver for runC
+    #   command: "sed -i 's/SystemdCgroup \= false/SystemdCgroup \= true/g' /etc/containerd/config.toml"
+    #   become: true
+
+    - name: configure the systemd cgroup driver for runC
+      lineinfile:
+        path: /etc/containerd/config.toml
+        regexp: "^(.*)SystemdCgroup(.*)$"
+        line: "SystemdCgroup = true"
