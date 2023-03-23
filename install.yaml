@@ -72,29 +72,14 @@
       command: "apt-mark hold kubelet kubeadm kubectl"
       become: true
 
-    - name: делаем дефалтным конфиг containerd
-      command: "containerd config default | tee /etc/containerd/config.toml >/dev/null 2>&1"
-      become: true
-
-    # - name: configure the systemd cgroup driver for runC
-    #   command: "sed -i 's/SystemdCgroup \= false/SystemdCgroup \= true/g' /etc/containerd/config.toml"
-    #   become: true
-
-    - name: configure the systemd cgroup driver for runC
-      lineinfile:
-        path: /etc/containerd/config.toml
-        regexp: "^(.*)SystemdCgroup(.*)$"
-        line: "SystemdCgroup = true"
-
-    # - name: делаем дефалтным конфиг containerd
-    #   command: "sudo containerd config default | sudo tee /etc/containerd/config.toml >/dev/null 2>&1"
-    #   become: true
-
-    # - name: Ansible delete file example
-    #   file:
-    #     path: /etc/containerd/config.toml
-    #     state: absent
-    #   become: true
+    - name: Copy config containerd
+      copy:
+        src: "./files/config.toml"
+        dest: /etc/containerd/config.toml
+        remote_src: no
+        mode: 0644
+        owner: root
+        group: root
 
     - name: restart containerd service
       service:
