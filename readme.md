@@ -1,67 +1,106 @@
-Not stable workin now!!!
+## Что я делаю
+Подготавливаю ВМ с Ubuntu 22.04.xx для k8s (на данный моментставится версия 1.26.3). 
 
-Создать пользователя с домашней директорией
+
+## Пререквизиты:
+
+1. Со стороны инфроструктуры
+* Должны быть записи в DNS для ВМ. 
+
+2. На ВМ, с которой выполняется установка
+* должен стоять ansible 
+```
+apt install ansible
+```
+* должен стоять sshpass
+```
+apt install sshpass
+```
+3. На ВМ, где будем развертывать k8s
+* Должен быть пользователь с домашней папкой и правами SUDO
 ```
 useradd -m ansible --shell /bin/bash
 passwd ansible
 usermod -aG sudo ansible
 ```
 
-Подготовка машины для развертывания:
+## My infrastructure:
 ```
-apt install ansible
+lb1.k8s.lo     192.168.0.140
+cp1.k8s.lo     129.168.0.141
+cp2.k8s.lo     192.168.0.142
+cp3.k8s.lo     192.168.0.143
+wn1.k8s.lo     192.168.0.144
+wn2.k8s.lo     192.168.0.145
+wn3.k8s.lo     192.168.0.146
 ```
-Для домашней лабы проще ходить по логин/пасс на ВМ, поэтому надо доставить sshpass:
+Где,
 
+lb - load balancer,
+cp - control plane,
+wn - worker node.
+
+
+
+## Запуск 
+
+Редактируем inventory под себя
+
+Затем запускаем на ВМ с ansible
 ```
-apt install sshpass
+ansible-playbook install.yaml -i inventory \
+--extra-vars "ansible_user=ansible ansible_password=<пароль> ansible_sudo_pass=<пароль>"
 ```
+Как ansible отработает, ВМ перезагрузятся. После этого можно запускать kubeadm init
 
-My infrastructure:
+## Создание кластера
+
+Запускаем на cp1:
 ```
-k8s-lb01       192.168.0.130
-k8s-master01   129.168.0.131
-k8s-master02   192.168.0.132
-k8s-master03   192.168.0.133
-k8s-node01     192.168.0.134
-k8s-node02     192.168.0.135
-k8s-node03     192.168.0.136
-```
-
-Подготовка VM Ubuntu 20.04
-
-```
-apt update && apt upgrade -y
-
-sudo mkdir -m 0755 -p /etc/apt/keyrings
-
-curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
-
-
-echo \
-  "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
-  $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
-
-chmod a+r /etc/apt/keyrings/docker.gpg
-
-sudo curl -fsSLo /etc/apt/keyrings/kubernetes-archive-keyring.gpg https://packages.cloud.google.com/apt/doc/apt-key.gpg
-
-echo "deb [signed-by=/etc/apt/keyrings/kubernetes-archive-keyring.gpg] https://apt.kubernetes.io/ kubernetes-xenial main" | sudo tee /etc/apt/sources.list.d/kubernetes.list
-
-apt update
-
-sudo apt-get install -y kubelet kubeadm kubectl docker-ce
-
+kubeadm init --control-plane-endpoint "cp1.k8s.lo:6443" --upload-certs
 ```
 
-Для k8s-lb01:
+Получем вывод:
+
+```
+To start using your cluster, you need to run the following as a regular user:
+ 
+  mkdir -p $HOME/.kube
+  sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+  sudo chown $(id -u):$(id -g) $HOME/.kube/config
+ 
+Alternatively, if you are the root user, you can run:
+ 
+  export KUBECONFIG=/etc/kubernetes/admin.conf
+ 
+You should now deploy a pod network to the cluster.
+Run "kubectl apply -f [podnetwork].yaml" with one of the options listed at:
+  https://kubernetes.io/docs/concepts/cluster-administration/addons/
+ 
+You can now join any number of the control-plane node running the following command on each as root:
+ 
+  kubeadm join cp1.k8s.lo:6443 --token 79itry.l0f4yaedzzmf35j3 \
+        --discovery-token-ca-cert-hash sha256:cf99d19f6696bfae7db18d442a6465206d054fc0fafe63831cb91bcd47e50480 \
+        --control-plane --certificate-key f0a532e256c3cead1dcf75797984347013df8b0477d17a4df5819973048630e8
+ 
+Please note that the certificate-key gives access to cluster sensitive data, keep it secret!
+As a safeguard, uploaded-certs will be deleted in two hours; If necessary, you can use
+"kubeadm init phase upload-certs --upload-certs" to reload certs afterward.
+ 
+Then you can join any number of worker nodes by running the following on each as root:
+ 
+kubeadm join cp1.k8s.lo:6443 --token 79itry.l0f4yaedzzmf35j3 \
+        --discovery-token-ca-cert-hash sha256:cf99d19f6696bfae7db18d442a6465206d054fc0fafe63831cb91bcd47e50480
+```
+Для отказоустойчивости можно доустановить балансировщик lb1-k8s.lo для контрол плейнов:
+
 ```
 apt install -y nginx
 systemctl enable nginx
 systemctl status nginx
 mkdir -p /etc/nginx/tcpconf.d
 nano /etc/nginx/nginx.conf
---->
+--- добавть строчку >
 include /etc/nginx/tcpconf.d/*;
 --->
 
@@ -70,9 +109,9 @@ add nginx conf --> /etc/nginx/tcpconf.d/kubernates.conf
 ```
 stream { 
   upstream kubernates { 
-    server 192.168.0.131:6443; 
-    server 192.168.0.132:6443; 
-    server 192.168.0.133:6443; 
+    server 192.168.0.141:6443; 
+    server 192.168.0.142:6443; 
+    server 192.168.0.143:6443; 
   } 
   server { 
     listen 6443; 
@@ -84,12 +123,3 @@ stream {
 ```
 nginx -s reload
 ```
-
-kubeadm-config.yaml
-```
-apiVersion: kubeadm.k8s.io/v1beta1
-kind: ClusterConfiguration
-kubernetesVersion: stable
-controlPlaneEndpoint: "192.168.0.130:6433"
-```
-kubeadm init --config=kubeadm-config.yaml --upload-certs
