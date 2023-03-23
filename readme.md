@@ -92,7 +92,8 @@ Then you can join any number of worker nodes by running the following on each as
 kubeadm join cp1.k8s.lo:6443 --token 79itry.l0f4yaedzzmf35j3 \
         --discovery-token-ca-cert-hash sha256:cf99d19f6696bfae7db18d442a6465206d054fc0fafe63831cb91bcd47e50480
 ```
-Для отказоустойчивости можно доустановить балансировщик lb1-k8s.lo для контрол плейнов:
+## lb1-k8s.lo
+Для "отказоустойчивости" можно доустановить балансировщик lb1-k8s.lo для контрол плейнов:
 
 ```
 apt install -y nginx
