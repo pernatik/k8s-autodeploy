@@ -14,16 +14,27 @@
         state: absent
         path: /etc/containerd/config.toml
 
-    - name: Ansible create file if it doesn't exist example
-      ignore_errors: yes
-      file:
-        path: "/etc/containerd/config.toml"
-        state: touch
-        mode: 0666
+    - name: Copy config containerd
+      copy:
+        src: "{{ item }}"
+        dest: /etc/ssl/dmosk
+        remote_src: no
+        mode: 0644
+        owner: root
+        group: root
+      with_fileglob:
+        - files/config.toml
 
-    - name: делаем дефалтным конфиг containerd
-      command: "sudo containerd config default | sudo tee /etc/containerd/config.toml >/dev/null 2>&1"
-      become: true
+    # - name: Ansible create file if it doesn't exist example
+    #   ignore_errors: yes
+    #   file:
+    #     path: "/etc/containerd/config.toml"
+    #     state: touch
+    #     mode: 0666
+
+    # - name: делаем дефалтным конфиг containerd
+    #   command: "sudo containerd config default | sudo tee /etc/containerd/config.toml >/dev/null 2>&1"
+    #   become: true
 
     # - name: делаем дефалтным конфиг containerd
     #   command: "sudo containerd config default > /etc/containerd/config.toml"
