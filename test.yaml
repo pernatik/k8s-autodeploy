@@ -16,14 +16,12 @@
 
     - name: Copy config containerd
       copy:
-        src: "{{ item }}"
-        dest: /etc/ssl/dmosk
+        src: "./files/config.toml"
+        dest: /etc/containerd/config.toml
         remote_src: no
         mode: 0644
         owner: root
         group: root
-      with_fileglob:
-        - files/config.toml
 
     # - name: Ansible create file if it doesn't exist example
     #   ignore_errors: yes
