@@ -8,11 +8,11 @@
   connection: ssh
 
   tasks:
-    - name: delete file
-      ignore_errors: yes
-      file:
-        state: absent
-        path: /etc/containerd/config.toml
+    #   - name: delete file
+    #     ignore_errors: yes
+    #     file:
+    #       state: absent
+    #       path: /etc/containerd/config.toml
 
     - name: Copy config containerd
       copy:
