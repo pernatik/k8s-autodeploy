@@ -73,8 +73,8 @@
       become: true
 
     - name: делаем дефалтным конфиг containerd
-      command: "sudo containerd config default | sudo tee /etc/containerd/config.toml >/dev/null 2>&1"
-      # become: true
+      command: "containerd config default | tee /etc/containerd/config.toml >/dev/null 2>&1"
+      become: true
 
     # - name: configure the systemd cgroup driver for runC
     #   command: "sed -i 's/SystemdCgroup \= false/SystemdCgroup \= true/g' /etc/containerd/config.toml"
