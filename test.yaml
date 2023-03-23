@@ -19,6 +19,7 @@
       file:
         path: "/etc/containerd/config.toml"
         state: touch
+        mode: 0666
 
     # - name: делаем дефалтным конфиг containerd
     #   command: "sudo containerd config default | sudo tee /etc/containerd/config.toml >/dev/null 2>&1"
