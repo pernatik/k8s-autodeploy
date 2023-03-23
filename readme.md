@@ -2,7 +2,7 @@ Not stable workin now!!!
 
 Создать пользователя с домашней директорией
 ```
-useradd -m ansible
+useradd -m ansible --shell /bin/bash
 passwd ansible
 usermod -aG sudo ansible
 ```
