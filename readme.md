@@ -55,7 +55,11 @@ ansible-playbook install.yaml -i inventory \
 
 ## Создание кластера
 
-Запускаем на cp1:
+UPD: Если создаем кластер с балансировщиком, то надо поготовить его заранее (пункт lb1-k8s.lo) и выполнить команду на cp1 (+ если указать заранее сеть, то удается избежать некоторые проблемы ... )
+```
+kubeadm init --control-plane-endpoint "lb1.k8s.lo:6443" --upload-certs --pod-network-cidr=10.10.0.0/16
+```
+Запускаем на cp1 (без балансировщика):
 ```
 kubeadm init --control-plane-endpoint "cp1.k8s.lo:6443" --upload-certs
 ```
