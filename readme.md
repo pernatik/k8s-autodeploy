@@ -114,9 +114,9 @@ add nginx conf --> /etc/nginx/tcpconf.d/kubernates.conf
 ```
 stream { 
   upstream kubernates { 
-    server 192.168.0.141:6443; 
-    server 192.168.0.142:6443; 
-    server 192.168.0.143:6443; 
+    server cp1.k8s.lo:6443;
+    server cp2.k8s.lo:6443;
+    server cp3.k8s.lo:6443;
   } 
   server { 
     listen 6443; 
